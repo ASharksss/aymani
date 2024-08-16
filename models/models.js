@@ -17,7 +17,8 @@ const Post_category = sequelize.define('post_category', {
 
 const Post_attachments = sequelize.define('post_attachments', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-  name: {type: DataTypes.STRING}
+  name: {type: DataTypes.STRING},
+  url: {type: DataTypes.STRING}
 })
 
 const Case = sequelize.define('case', {
@@ -36,10 +37,11 @@ const Case_attachments = sequelize.define('case_attachments', {
 
 const Service = sequelize.define('service', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-  name: {type: DataTypes.STRING}
+  name: {type: DataTypes.STRING},
+  price: {type: DataTypes.INTEGER}
 })
 
-const Comment = sequelize.define('service', {
+const Comment = sequelize.define('сomment', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   username: {type: DataTypes.STRING},
   text: {type: DataTypes.TEXT}
