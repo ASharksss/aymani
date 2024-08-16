@@ -9,5 +9,6 @@ router.get('/getPost/:id', postController.getPost)
 router.delete('/deletePost', postController.deletePost)
 
 router.post('/createCase', postController.createCase)
+router.delete('/deleteCase', postController.deleteCase)
 
 module.exports = router

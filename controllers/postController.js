@@ -165,6 +165,30 @@ class PostController {
     }
   }
 
+  async deleteCase(req, res) {
+    try {
+      const {id} = req.body
+      const files = await Case_attachments.findAll({where: {caseId: id}, attributes: ['id', 'name']})
+      for (let item of files) {
+        const folderPath = path.join(__dirname, '..', 'static/case_images');
+        const filePath = path.join(folderPath, item.name);
+        await fs.promises.unlink(filePath);
+        await Case_attachments.destroy({where: {id: item.id}})
+      }
+      const case_item = await Case.findOne({where: id})
+      if (case_item) {
+        const coverFileName = path.basename(case_item.cover);
+        const folderPath = path.join(__dirname, '..', 'static/case_covers');
+        const filePath = path.join(folderPath, coverFileName);
+        await fs.promises.unlink(filePath);
+      }
+      await Case.destroy({where: {id}})
+      return res.json(case_item)
+    } catch (e) {
+      return res.status(500).json({error: e.message})
+    }
+  }
+
 }
 
 module.exports = new PostController()
