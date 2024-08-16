@@ -10,6 +10,7 @@ router.delete('/deletePost', postController.deletePost)
 
 router.post('/createCase', postController.createCase)
 router.delete('/deleteCase', postController.deleteCase)
+router.get('/getCases', postController.getCases)
 
 router.post('/createService', postController.createService)
 router.put('/updateService', postController.updateService)

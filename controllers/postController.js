@@ -175,6 +175,17 @@ class PostController {
     }
   }
 
+  async getCases(req, res) {
+    try {
+      const cases = await Case.findAll({
+        attributes: ['name']
+      })
+      return res.json(cases)
+    } catch (e) {
+      return res.status(500).json({error: e.message})
+    }
+  }
+
   async createService(req, res) {
     try {
       const arr = req.body
@@ -203,6 +214,7 @@ class PostController {
       return res.json({error: e.message})
     }
   }
+
 
 }
 
