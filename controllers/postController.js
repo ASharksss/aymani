@@ -151,20 +151,6 @@ class PostController {
     }
   }
 
-  async createService(req, res) {
-    try {
-      const arr = req.body
-      let correct = []
-      for (let item of arr) {
-        await Service.create({name: item.name, price: item.price})
-          .then(() => correct.push(item))
-      }
-      return res.json(correct)
-    } catch (e) {
-      return res.status(500).json({error: e.message})
-    }
-  }
-
   async deleteCase(req, res) {
     try {
       const {id} = req.body
@@ -186,6 +172,35 @@ class PostController {
       return res.json(case_item)
     } catch (e) {
       return res.status(500).json({error: e.message})
+    }
+  }
+
+  async createService(req, res) {
+    try {
+      const arr = req.body
+      let correct = []
+      for (let item of arr) {
+        await Service.create({name: item.name, price: item.price})
+          .then(() => correct.push(item))
+      }
+      return res.json(correct)
+    } catch (e) {
+      return res.status(500).json({error: e.message})
+    }
+  }
+
+  async updateService(req, res) {
+    try {
+      const updatedService = req.body
+      for (let item of updatedService) {
+        await Service.update(
+          {name: item.name, price: item.price},
+          {where: {id: item.id}}
+        )
+      }
+      return res.json(updatedService)
+    } catch (e) {
+      return res.json({error: e.message})
     }
   }
 
