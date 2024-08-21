@@ -1,4 +1,12 @@
-const {Service, Post, Post_attachments, Post_category, Case, Case_attachments} = require("../models/models");
+const {
+  Service,
+  Post,
+  Post_attachments,
+  Post_category,
+  Case,
+  Case_attachments,
+  Case_blocks
+} = require("../models/models");
 const {v4: uuidv4} = require('uuid');
 const path = require('path')
 const fs = require("fs");
@@ -109,44 +117,49 @@ class PostController {
 
   async createCase(req, res) {
     try {
-      const {name, customer, description, html} = req.body
-      const cover = req?.files?.cover
-      const images = req?.files?.images
-      let saveImages = []
-      let coverName
+      const case_item = req.body
+      const files = req.files.files
+      const cover = req.files.cover
+      let coverName, coverTypeFile
+      let imageName, imageTypeFile
+
       if (cover) {
-        const coverTypeFile = cover.name.split('.').pop();
-        if (coverTypeFile !== 'jpeg' && coverTypeFile !== 'png' && coverTypeFile !== 'jpg') {
-          return res.json('Неподходящее расширение файла для обложки');
-        }
+        coverTypeFile = cover.name.split('.').pop()
         coverName = `${uuidv4()}.${coverTypeFile}`;
         await cover.mv(path.resolve(__dirname, '..', 'static/case_covers', coverName));
+
       }
-      let case_item = await Case.create({
-        name, customer, description, html, cover: `static/case_covers/${coverName}`
+      let box = await Case.create({
+        name: case_item.name,
+        description: case_item.description,
+        tagId: case_item.tagId,
+        cover: `/static/case_covers/${coverName}`
       })
-      if (images) {
-        let newHtml = html
-        for (let item of images) {
-          let imagesTypeFile = item.name.split('.').pop();
-          if (imagesTypeFile !== 'jpeg' && imagesTypeFile !== 'png' && imagesTypeFile !== 'jpg') {
-            return res.json('Неподходящее расширение файла для вложения');
-          }
-          let imageName = `${uuidv4()}.${imagesTypeFile}`;
-          await item.mv(path.resolve(__dirname, '..', 'static/case_images', imageName));
-          const imageUrl = `/static/case_images/${imageName}`;
-          // Обновление имен файлов изображений в HTML
-          newHtml = newHtml.replace(item.name, imageUrl);
-          await Case_attachments.create({name: imageName, caseId: case_item.id})
-            .then(() => saveImages.push(imageName))
-          await Case.update(
-            {html: newHtml},
-            {where: {id: case_item.id}}
-          )
+      await Case_attachments.create({
+        name: coverName,
+        caseId: box.id
+      })
+      for (let item of files) {
+        imageTypeFile = item.name.split('.').pop()
+        imageName = `${uuidv4()}.${imageTypeFile}`
+        await item.mv(path.resolve(__dirname, '..', 'static/case_images', imageName))
+        await Case_attachments.create({
+          name: imageName,
+          caseId: box.id
+        })
+        const block = JSON.parse(case_item.blocks).find(block => block.file === item.name);
+        if (block) {
+          await Case_blocks.create({
+            text: block.text,
+            type_block: block.type_block,
+            caseId: box.id,
+            attachment: `/static/case_images/${imageName}`
+          })
         }
       }
-      return res.json(case_item)
+      return res.json({case_item, files})
     } catch (e) {
+      console.log(e)
       return res.status(500).json({error: e.message})
     }
   }

@@ -10,7 +10,25 @@ const Post = sequelize.define('post', {
   views: {type: DataTypes.INTEGER}
 })
 
-const Post_category = sequelize.define('post_category', {
+const Case_blocks = sequelize.define('case_blocks', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  text: {type: DataTypes.TEXT},
+  attachment: {type: DataTypes.STRING},
+  type_block: {type: DataTypes.STRING},
+})
+
+const Color_shem = sequelize.define('color_shem', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  base_color: {type: DataTypes.STRING},
+  accent_color: {type: DataTypes.STRING}
+})
+
+const Nuance_color  = sequelize.define('nuance_color', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  color: {type: DataTypes.STRING}
+})
+
+const Tag  = sequelize.define('tag', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING}
 })
@@ -26,8 +44,7 @@ const Case = sequelize.define('case', {
   name: {type: DataTypes.STRING},
   customer: {type: DataTypes.STRING},
   description: {type: DataTypes.TEXT},
-  cover: {type: DataTypes.STRING},
-  html: {type: DataTypes.TEXT},
+  cover: {type: DataTypes.STRING}
 })
 
 const Case_attachments = sequelize.define('case_attachments', {
@@ -49,14 +66,23 @@ const Comment = sequelize.define('сomment', {
 
 //Relationships
 
-Post_category.hasMany(Post)
-Post.belongsTo(Post_category)
-
 Post.hasMany(Post_attachments)
 Post_attachments.belongsTo(Post)
 
 Case.hasMany(Case_attachments)
 Case_attachments.belongsTo(Case)
+
+Tag.hasMany(Case)
+Case.belongsTo(Tag)
+
+Case.hasMany(Case_blocks)
+Case_blocks.belongsTo(Case)
+
+Case_blocks.hasMany(Color_shem)
+Color_shem.belongsTo(Case_blocks)
+
+Color_shem.hasMany(Nuance_color)
+Nuance_color.belongsTo(Color_shem)
 
 Comment.hasMany(Comment)
 Comment.belongsTo(Comment)
@@ -65,5 +91,5 @@ Post.hasMany(Comment)
 Comment.belongsTo(Post)
 
 module.exports = {
-  Post, Post_category, Post_attachments, Case, Case_attachments, Comment, Service
+  Post, Post_attachments, Case, Case_attachments, Comment, Service, Case_blocks, Nuance_color, Color_shem, Tag,
 }
