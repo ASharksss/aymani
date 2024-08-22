@@ -143,49 +143,57 @@ class PostController {
         "colors": null
       }
     ]
-
     try {
       const case_item = req.body
-      const files = req.files.files
-      const cover = req.files.cover
+      const files = req.files.files //вложения блоков
+      const cover = req.files.cover // обложка портфолио
       let coverName, coverTypeFile
       let imageName, imageTypeFile
 
       if (cover) {
-        coverTypeFile = cover.name.split('.').pop()
-        coverName = `${uuidv4()}.${coverTypeFile}`;
-        await cover.mv(path.resolve(__dirname, '..', 'static/case_covers', coverName));
+        coverTypeFile = cover.name.split('.').pop() //берем расширение файла
+        coverName = `${uuidv4()}.${coverTypeFile}`; // устанавливаем новое уникальное имя
+        await cover.mv(path.resolve(__dirname, '..', 'static/case_covers', coverName)); // записываем файл на сервер
       }
+      //Создаем элемент портфолио
       let box = await Case.create({
         name: case_item.name,
         customer: case_item.customer,
         description: case_item.description,
         tagId: case_item.tagId,
-        cover: `/static/case_covers/${coverName}`
+        cover: `/static/case_covers/${coverName}` //генерируем ссылку на обожку
       })
+      //перебираем вложения
       for (let item of files) {
+        //сохранение файла
         imageTypeFile = item.name.split('.').pop()
         imageName = `${uuidv4()}.${imageTypeFile}`
         await item.mv(path.resolve(__dirname, '..', 'static/case_images', imageName))
+        //запись файла в бд
         await Case_attachments.create({
           name: imageName,
           caseId: box.id,
         })
+        //находим блок с конкретной фотографией
         const block = JSON.parse(case_item.blocks).find(block => block.image === item.name);
         if (block) {
+          //создаем блок
           let block_item = await Case_blocks.create({
             text: block.text,
             type_block: block.type,
             caseId: box.id,
-            attachment: `/static/case_images/${imageName}`,
+            attachment: `/static/case_images/${imageName}`, //генерируем ссылку на вложение
             attachment_title: block.attachment_title
           })
+          //если есть блок с цветовой схемой
           if (block.colors) {
-           let color_shem = await Color_shem.create({
+            //записываем базовые и акцентные цвета
+            let color_shem = await Color_shem.create({
               base_color: block.colors.base,
               accent_color: block.colors.focus,
               caseBlockId: block_item.id
             })
+            //записываем нюанс цвета
             for (let element of block.colors.nuans) {
               await Nuance_color.create({
                 color: element,
@@ -195,6 +203,7 @@ class PostController {
           }
         }
       }
+
       return res.json(case_item)
     } catch (e) {
       console.log(e)
@@ -282,6 +291,37 @@ class PostController {
         )
       }
       return res.json(updatedService)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async createTag(req, res) {
+    try {
+      const {tagName} = req.body
+      const tag = await Tag.create({
+        name: tagName
+      })
+      return res.json(tag)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async getTags(req, res) {
+    try {
+      const tags = await Tag.findAll()
+      return res.json(tags)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async deleteTag(req, res) {
+    try {
+      const {id} = req.params
+      const tag = await Tag.destroy({where: {id}})
+      return res.json('все')
     } catch (e) {
       return res.json({error: e.message})
     }
