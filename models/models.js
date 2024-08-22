@@ -15,6 +15,7 @@ const Case_blocks = sequelize.define('case_blocks', {
   text: {type: DataTypes.TEXT},
   attachment: {type: DataTypes.STRING},
   type_block: {type: DataTypes.STRING},
+  attachment_title: {type: DataTypes.STRING}
 })
 
 const Color_shem = sequelize.define('color_shem', {
@@ -36,7 +37,8 @@ const Tag  = sequelize.define('tag', {
 const Post_attachments = sequelize.define('post_attachments', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING},
-  url: {type: DataTypes.STRING}
+  url: {type: DataTypes.STRING},
+
 })
 
 const Case = sequelize.define('case', {
@@ -68,6 +70,9 @@ const Comment = sequelize.define('сomment', {
 
 Post.hasMany(Post_attachments)
 Post_attachments.belongsTo(Post)
+
+Tag.hasMany(Post)
+Post.belongsTo(Tag)
 
 Case.hasMany(Case_attachments)
 Case_attachments.belongsTo(Case)
