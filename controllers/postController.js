@@ -138,7 +138,16 @@ class PostController {
       {
         "type": "Кодинг",
         "text": "Описание",
+        "image": "lubok-club-p-oboi-anime-priroda-temnie-14.jpg",
+        "attachment_title": "Джоня, в постельке",
+        "colors": null
+      },
+      {
+        "type": "Результат",
+        "text": "Описание",
         "image": null,
+        "mobile_version": "Блог.png",
+        "desktop_version": "Блоги.png",
         "attachment_title": "Джоня, в постельке",
         "colors": null
       }
@@ -147,13 +156,28 @@ class PostController {
       const case_item = req.body
       const files = req.files.files //вложения блоков
       const cover = req.files.cover // обложка портфолио
+      const mobile_version = req.files.mobile_version
+      const desktop_version = req.files.desktop_version
+
       let coverName, coverTypeFile
       let imageName, imageTypeFile
+      let mobileName, mobileTypeFile
+      let desktopName, desktopTypeFile
 
       if (cover) {
         coverTypeFile = cover.name.split('.').pop() //берем расширение файла
         coverName = `${uuidv4()}.${coverTypeFile}`; // устанавливаем новое уникальное имя
         await cover.mv(path.resolve(__dirname, '..', 'static/case_covers', coverName)); // записываем файл на сервер
+      }
+      if (mobile_version && desktop_version) {
+        mobileTypeFile = mobile_version.name.split('.').pop()
+        mobileName = `${uuidv4()}.${mobileTypeFile}`
+        await mobile_version.mv(path.resolve(__dirname, '..', 'static/case_images', mobileName))
+      }
+      if (mobile_version && desktop_version) {
+        desktopTypeFile = desktop_version.name.split('.').pop()
+        desktopName = `${uuidv4()}.${desktopTypeFile}`
+        await desktop_version.mv(path.resolve(__dirname, '..', 'static/case_images', desktopName))
       }
       //Создаем элемент портфолио
       let box = await Case.create({
@@ -176,6 +200,7 @@ class PostController {
         })
         //находим блок с конкретной фотографией
         const block = JSON.parse(case_item.blocks).find(block => block.image === item.name);
+
         if (block) {
           //создаем блок
           let block_item = await Case_blocks.create({
@@ -202,11 +227,22 @@ class PostController {
             }
           }
         }
-      }
 
+      }
+      const result = JSON.parse(case_item.blocks).find(block => block.image === null)
+      if (result) {
+        let block_item = await Case_blocks.create({
+          text: result.text,
+          type_block: result.type,
+          caseId: box.id,
+          attachment: null, //генерируем ссылку на вложение
+          attachment_title: result.attachment_title,
+          mobile_version: `/static/case_images/${mobileName}`,
+          desktop_version: `/static/case_images/${desktopName}`,
+        })
+      }
       return res.json(case_item)
     } catch (e) {
-      console.log(e)
       return res.status(500).json({error: e.message})
     }
   }
@@ -240,6 +276,7 @@ class PostController {
     }
   }
 
+  //Нужно добавить фото проекта и похожие проекты
   async getCases(req, res) {
     try {
       const cases = await Case.findAll({

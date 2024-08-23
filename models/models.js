@@ -15,7 +15,9 @@ const Case_blocks = sequelize.define('case_blocks', {
   text: {type: DataTypes.TEXT},
   attachment: {type: DataTypes.STRING},
   type_block: {type: DataTypes.STRING},
-  attachment_title: {type: DataTypes.STRING}
+  attachment_title: {type: DataTypes.STRING},
+  mobile_version: {type: DataTypes.STRING},
+  desktop_version: {type: DataTypes.STRING},
 })
 
 const Color_shem = sequelize.define('color_shem', {
