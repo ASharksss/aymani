@@ -10,6 +10,7 @@ const {
 const {v4: uuidv4} = require('uuid');
 const path = require('path')
 const fs = require("fs");
+const {Sequelize, Op} = require("sequelize");
 
 class PostController {
   async createPost(req, res) {
@@ -293,12 +294,29 @@ class PostController {
       const {id} = req.params
       const case_item = await Case.findOne({
         where: {id},
-        include: [
-          {model: Case_blocks},
-          {model: Tag, attributes: ['name']}
+        include: [{
+          model: Case_blocks,
+          include: [{
+            model: Color_shem,
+            attributes: ['id', 'base_color', 'accent_color'],
+            include: [{
+              model: Nuance_color,
+              attributes: ['id', 'color']
+            }]
+          }]
+        },
+          {model: Tag, attributes: ['name']},
         ]
       })
-      return res.json(case_item)
+
+      let cases = await Case.findAll({
+        where: {
+          [Op.not]: {id}
+        },
+        order: Sequelize.literal('RAND()'), // Для MySQL
+        limit: 3
+      })
+      return res.json({case_item, cases})
     } catch (e) {
       return res.json({error: e.message})
     }
