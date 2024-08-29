@@ -65,7 +65,12 @@ const Service = sequelize.define('service', {
 const Comment = sequelize.define('сomment', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   username: {type: DataTypes.STRING},
-  text: {type: DataTypes.TEXT}
+  text: {type: DataTypes.TEXT},
+  parentCommentId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    defaultValue: null
+  },
 })
 
 //Relationships
@@ -91,8 +96,8 @@ Color_shem.belongsTo(Case_blocks)
 Color_shem.hasMany(Nuance_color)
 Nuance_color.belongsTo(Color_shem)
 
-Comment.hasMany(Comment)
-Comment.belongsTo(Comment)
+Comment.hasMany(Comment, { as: 'Replies', foreignKey: 'parentCommentId' });
+Comment.belongsTo(Comment, { as: 'ParentComment', foreignKey: 'parentCommentId' });
 
 Post.hasMany(Comment)
 Comment.belongsTo(Post)

@@ -4,13 +4,14 @@ const {
   Post_attachments,
   Post_category,
   Case,
-  Case_attachments,
+  Case_attachments, Comment,
   Case_blocks, Tag, Color_shem, Nuance_color
 } = require("../models/models");
 const {v4: uuidv4} = require('uuid');
 const path = require('path')
 const fs = require("fs");
 const {Sequelize, Op} = require("sequelize");
+const {validationResult} = require("express-validator")
 
 class PostController {
   async createPost(req, res) {
@@ -89,6 +90,18 @@ class PostController {
       return res.json(post)
     } catch (e) {
       return res.status(500).json({error: e.message})
+    }
+  }
+
+  async getByTagPosts(req, res) {
+    try {
+      const {tagId} = req.query
+      const posts = await Post.findAll({
+        where: {tagId}
+      })
+      return res.json(posts)
+    } catch (e) {
+      return res.json({error: e.message})
     }
   }
 
@@ -277,7 +290,6 @@ class PostController {
     }
   }
 
-  //Нужно добавить фото проекта и похожие проекты
   async getCases(req, res) {
     try {
       const cases = await Case.findAll({
@@ -379,6 +391,21 @@ class PostController {
       return res.json('все')
     } catch (e) {
       return res.json({error: e.message})
+    }
+  }
+
+  async createComment(req, res) {
+    try {
+      const {username, text, parentCommentId, postId} = req.body
+      if (!username) return res.json("Укажите имя")
+      if (!text) return res.json("Введите текст")
+      if (!postId) return res.json("ошибка, postId не привязан")
+      const comment = await Comment.create({
+        username, text, parentCommentId, postId
+      })
+      return res.json(comment)
+    } catch (e) {
+      return res.status(500).json({error: e.message})
     }
   }
 
