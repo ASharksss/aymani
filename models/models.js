@@ -4,7 +4,7 @@ const {DataTypes} = require('sequelize')
 const Post = sequelize.define('post', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   title: {type: DataTypes.STRING},
-  description: {type: DataTypes.STRING},
+  description: {type: DataTypes.TEXT},
   cover: {type: DataTypes.STRING},
   html: {type: DataTypes.TEXT},
   views: {type: DataTypes.INTEGER}

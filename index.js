@@ -7,8 +7,13 @@ const port = process.env.PORT
 const sequelize = require("./db");
 require('./models/models')
 const router = require("./routes");
+const originAccess = process.env.originAccess || '["http://localhost:3000"]'
 
 app.use('/static', express.static('static'))
+app.use(cors({
+  credentials: true, origin: JSON.parse(originAccess),
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-position'], methods: ['GET', 'POST', 'PUT', 'OPTIONS', 'DELETE']
+}))
 app.use(express.json())
 app.use(fileUpload())
 app.use('/api', router)

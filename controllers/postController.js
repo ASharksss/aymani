@@ -70,7 +70,7 @@ class PostController {
   async getAllPosts(req, res) {
     try {
       const posts = await Post.findAll({
-        attributes: ['id', 'title', 'description', 'views', 'cover', 'tagId'],
+        attributes: ['id', 'title', 'description', 'views', 'cover', 'tagId', 'createdAt'],
         include: [{model: Tag, attributes: ['id', 'name']}],
         order: [['createdAt', 'DESC']]
       })
