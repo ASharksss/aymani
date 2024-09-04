@@ -15,12 +15,13 @@ router.get('/getCase/:id', postController.getCase)
 
 router.post('/createService', postController.createService)
 router.put('/updateService', postController.updateService)
-
+router.get('/getServices', postController.getServices)
 
 router.post('/createTag', postController.createTag)
 router.get('/getTags', postController.getTags)
 router.delete('/deleteTag/:id', postController.deleteTag)
 
 router.post('/createComment', postController.createComment)
+router.get('/getComments/:id', postController.getComments)
 
 module.exports = router

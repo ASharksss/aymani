@@ -12,6 +12,8 @@ const path = require('path')
 const fs = require("fs");
 const {Sequelize, Op} = require("sequelize");
 const {validationResult} = require("express-validator")
+const moment = require("moment");
+require('moment/locale/ru');
 
 class PostController {
   async createPost(req, res) {
@@ -320,15 +322,7 @@ class PostController {
           {model: Tag, attributes: ['name']},
         ]
       })
-
-      let cases = await Case.findAll({
-        where: {
-          [Op.not]: {id}
-        },
-        order: Sequelize.literal('RAND()'), // Для MySQL
-        limit: 3
-      })
-      return res.json({case_item, cases})
+      return res.json(case_item)
     } catch (e) {
       return res.json({error: e.message})
     }
@@ -360,6 +354,17 @@ class PostController {
       return res.json(updatedService)
     } catch (e) {
       return res.json({error: e.message})
+    }
+  }
+
+  async getServices(req, res) {
+    try {
+      const services = await Service.findAll({
+        attributes: ['name', 'price']
+      })
+      return res.json(services)
+    } catch (e) {
+      return res.status(500).json({error: e.message})
     }
   }
 
@@ -404,6 +409,45 @@ class PostController {
         username, text, parentCommentId, postId
       })
       return res.json(comment)
+    } catch (e) {
+      return res.status(500).json({error: e.message})
+    }
+  }
+
+  async getComments(req, res) {
+    try {
+      const {id} = req.params
+      const comments = await Comment.findAll({
+        where: {postId: id},
+        attributes: ['id', 'username', 'createdAt', 'text', 'parentCommentId']
+      })
+
+      const commentMap = new Map();
+      // Создаем карту комментариев по их ID
+      comments.forEach(comment => {
+        commentMap.set(comment.id, {
+          ...comment.dataValues,
+
+          createdAt: moment(comment.createdAt).fromNow(),
+          replies: []
+        });
+      });
+
+      const result = [];
+      // Построение дерева комментариев
+      commentMap.forEach(comment => {
+        if (comment.parentCommentId === null) {
+          // Если у комментария нет родителя, добавляем его в корень
+          result.push(comment);
+        } else {
+          // Если есть родитель, добавляем текущий комментарий в его дочерние
+          const parent = commentMap.get(comment.parentCommentId);
+          if (parent) {
+            parent.replies.push(comment);
+          }
+        }
+      });
+      return res.json(result)
     } catch (e) {
       return res.status(500).json({error: e.message})
     }
