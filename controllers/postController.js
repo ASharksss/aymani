@@ -330,13 +330,16 @@ class PostController {
 
   async createService(req, res) {
     try {
-      const arr = req.body
-      let correct = []
-      for (let item of arr) {
-        await Service.create({name: item.name, price: item.price})
-          .then(() => correct.push(item))
-      }
-      return res.json(correct)
+      const {name, price} = req.body
+      const image = req.files.image
+
+      if (!image) return res.json("Добавьте изображение услуги")
+      let typeImage = image.name.split('.').pop()
+      let imageName = `${uuidv4()}.${typeImage}`
+      await image.mv(path.resolve(__dirname, '..', 'static/service_images', imageName));
+      const service = await Service.create({name, price, image_url: `/static/service_images/${imageName}`})
+
+      return res.json(service)
     } catch (e) {
       return res.status(500).json({error: e.message})
     }
@@ -360,7 +363,7 @@ class PostController {
   async getServices(req, res) {
     try {
       const services = await Service.findAll({
-        attributes: ['name', 'price']
+        attributes: ['name', 'price', 'image_url']
       })
       return res.json(services)
     } catch (e) {

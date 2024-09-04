@@ -59,7 +59,8 @@ const Case_attachments = sequelize.define('case_attachments', {
 const Service = sequelize.define('service', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING},
-  price: {type: DataTypes.INTEGER}
+  price: {type: DataTypes.INTEGER},
+  image_url: {type: DataTypes.TEXT}
 })
 
 const Comment = sequelize.define('сomment', {
