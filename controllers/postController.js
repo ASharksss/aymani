@@ -132,42 +132,6 @@ class PostController {
   }
 
   async createCase(req, res) {
-    const block = [
-      {
-        "type": "Планирование",
-        "text": "Описание",
-        "image": "photo_2023-08-02_06-17-07.jpg",
-        "attachment_title": "Джоня, в постельке",
-        "colors": null
-      },
-      {
-        "type": "Дизайн",
-        "text": "Описание",
-        "image": "photo_2023-09-03_10-44-08.jpg",
-        "attachment_title": "Джоня утром, в постельке",
-        "colors": {
-          "base": "blue",
-          "nuans": ["black", "gray", "white"],
-          "focus": "red"
-        }
-      },
-      {
-        "type": "Кодинг",
-        "text": "Описание",
-        "image": "lubok-club-p-oboi-anime-priroda-temnie-14.jpg",
-        "attachment_title": "Джоня, в постельке",
-        "colors": null
-      },
-      {
-        "type": "Результат",
-        "text": "Описание",
-        "image": null,
-        "mobile_version": "Блог.png",
-        "desktop_version": "Блоги.png",
-        "attachment_title": "Джоня, в постельке",
-        "colors": null
-      }
-    ]
     try {
       const case_item = req.body
       const files = req.files.files //вложения блоков
@@ -222,6 +186,7 @@ class PostController {
           let block_item = await Case_blocks.create({
             text: block.text,
             type_block: block.type,
+            description: block.description,
             caseId: box.id,
             attachment: `/static/case_images/${imageName}`, //генерируем ссылку на вложение
             attachment_title: block.attachment_title
