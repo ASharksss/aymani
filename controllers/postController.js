@@ -47,7 +47,7 @@ class PostController {
         let newHtml = html
         for (let item of images) {
           let imagesTypeFile = item.name.split('.').pop();
-          if (imagesTypeFile !== 'jpeg' && imagesTypeFile !== 'png' && imagesTypeFile !== 'jpg') {
+          if (imagesTypeFile !== 'jpeg' && imagesTypeFile !== 'png' && imagesTypeFile !== 'jpg' && imagesTypeFile !== 'gif') {
             return res.json('Неподходящее расширение файла для вложения');
           }
           let imageName = `${uuidv4()}.${imagesTypeFile}`;
@@ -89,6 +89,28 @@ class PostController {
         where: {id},
         include: [{model: Tag, attributes: ['id', 'name']}]
       })
+      const new_posts = await Post.findAll({
+        where: {
+          id: {
+            [Op.not]: id
+          },
+        },
+        order: [['createdAt', 'DESC']],
+        limit: 3,
+        attributes: ["id", "title", "cover"]
+      })
+      const like_posts = await Post.findAll({
+        where: {
+          id: {
+            [Op.not]: id
+          },
+          tagId: post.tagId
+        },
+        limit: 3,
+        attributes: ["id", "title", "cover"]
+      })
+      post.dataValues.new_posts = new_posts
+      post.dataValues.like_posts = like_posts
       return res.json(post)
     } catch (e) {
       return res.status(500).json({error: e.message})
@@ -287,6 +309,15 @@ class PostController {
           {model: Tag, attributes: ['name']},
         ]
       })
+      const cases = await Case.findAll({
+        where: {
+          id: {
+            [Op.not]: id
+          }
+        },
+        limit: 3
+      })
+      case_item.dataValues.cases = cases
       return res.json(case_item)
     } catch (e) {
       return res.json({error: e.message})
@@ -328,6 +359,9 @@ class PostController {
   async getServices(req, res) {
     try {
       const services = await Service.findAll({
+        where: {
+          active: true
+        },
         attributes: ['name', 'price', 'image_url']
       })
       return res.json(services)

@@ -7,7 +7,8 @@ const Post = sequelize.define('post', {
   description: {type: DataTypes.TEXT},
   cover: {type: DataTypes.STRING},
   html: {type: DataTypes.TEXT},
-  views: {type: DataTypes.INTEGER}
+  views: {type: DataTypes.INTEGER},
+  keywords: {type: DataTypes.TEXT}
 })
 
 const Case_blocks = sequelize.define('case_blocks', {
@@ -49,7 +50,8 @@ const Case = sequelize.define('case', {
   name: {type: DataTypes.STRING},
   customer: {type: DataTypes.STRING},
   description: {type: DataTypes.TEXT},
-  cover: {type: DataTypes.STRING}
+  cover: {type: DataTypes.STRING},
+  keywords: {type: DataTypes.TEXT}
 })
 
 const Case_attachments = sequelize.define('case_attachments', {
@@ -61,7 +63,8 @@ const Service = sequelize.define('service', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING},
   price: {type: DataTypes.INTEGER},
-  image_url: {type: DataTypes.TEXT}
+  image_url: {type: DataTypes.TEXT},
+  active: {type: DataTypes.BOOLEAN, defaultValue: true},
 })
 
 const Comment = sequelize.define('сomment', {
