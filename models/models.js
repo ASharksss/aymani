@@ -28,12 +28,12 @@ const Color_shem = sequelize.define('color_shem', {
   accent_color: {type: DataTypes.STRING}
 })
 
-const Nuance_color  = sequelize.define('nuance_color', {
+const Nuance_color = sequelize.define('nuance_color', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   color: {type: DataTypes.STRING}
 })
 
-const Tag  = sequelize.define('tag', {
+const Tag = sequelize.define('tag', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING}
 })
@@ -67,6 +67,30 @@ const Service = sequelize.define('service', {
   active: {type: DataTypes.BOOLEAN, defaultValue: true},
 })
 
+const Functional = sequelize.define('functional', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  name: {type: DataTypes.STRING},
+  price: {type: DataTypes.INTEGER},
+  days: {type: DataTypes.INTEGER},
+  description: {type: DataTypes.TEXT},
+  file: {type: DataTypes.STRING},
+  checked: {type: DataTypes.BOOLEAN},
+})
+
+const Lead = sequelize.define('lead', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  name: {type: DataTypes.STRING},
+  contact: {type: DataTypes.STRING},
+})
+
+const Service_post = sequelize.define('service_post', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+})
+
+const Lead_content = sequelize.define('lead_content', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+})
+
 const Comment = sequelize.define('сomment', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   username: {type: DataTypes.STRING},
@@ -79,6 +103,20 @@ const Comment = sequelize.define('сomment', {
 })
 
 //Relationships
+Lead.hasMany(Lead_content)
+Lead_content.belongsTo(Lead)
+
+Functional.hasMany(Lead_content)
+Lead_content.belongsTo(Functional)
+
+Service.hasMany(Functional)
+Functional.belongsTo(Service)
+
+Service.hasMany(Service_post)
+Service_post.belongsTo(Service)
+
+Post.hasMany(Service_post)
+Service_post.belongsTo(Post)
 
 Post.hasMany(Post_attachments)
 Post_attachments.belongsTo(Post)
@@ -101,12 +139,25 @@ Color_shem.belongsTo(Case_blocks)
 Color_shem.hasMany(Nuance_color)
 Nuance_color.belongsTo(Color_shem)
 
-Comment.hasMany(Comment, { as: 'Replies', foreignKey: 'parentCommentId' });
-Comment.belongsTo(Comment, { as: 'ParentComment', foreignKey: 'parentCommentId' });
+Comment.hasMany(Comment, {as: 'Replies', foreignKey: 'parentCommentId'});
+Comment.belongsTo(Comment, {as: 'ParentComment', foreignKey: 'parentCommentId'});
 
 Post.hasMany(Comment)
 Comment.belongsTo(Post)
 
 module.exports = {
-  Post, Post_attachments, Case, Case_attachments, Comment, Service, Case_blocks, Nuance_color, Color_shem, Tag,
+  Post,
+  Post_attachments,
+  Case,
+  Case_attachments,
+  Comment,
+  Service,
+  Case_blocks,
+  Nuance_color,
+  Color_shem,
+  Tag,
+  Service_post,
+  Lead,
+  Functional,
+  Lead_content
 }
