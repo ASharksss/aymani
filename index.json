@@ -48,5 +48,24 @@
     "desktop_version": "desktop.png",
     "attachment_title": "Элиана интернет-магазин",
     "colors": null
-  }
+  },
+  [
+    {
+      "name": "Блог",
+      "price": "24000",
+      "days": 5,
+      "description": "Блог помогает приобретать аудиторию ",
+      "image": "",
+      "checked": false
+    },
+    {
+      "name": "Портфолио просто с фото",
+      "price": "9200",
+      "days": 3,
+      "description": "Страница или блог, которая отображает Ваши работы",
+      "image": "",
+      "checked": false
+    }
+
+  ]
 ]

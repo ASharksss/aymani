@@ -5,7 +5,7 @@ const {
   Post_category,
   Case,
   Case_attachments, Comment,
-  Case_blocks, Tag, Color_shem, Nuance_color
+  Case_blocks, Tag, Color_shem, Nuance_color, Functional, Lead, Lead_content, Service_post
 } = require("../models/models");
 const {v4: uuidv4} = require('uuid');
 const path = require('path')
@@ -326,7 +326,7 @@ class PostController {
 
   async createService(req, res) {
     try {
-      const {name, price} = req.body
+      const {name, price, functions} = req.body
       const image = req.files.image
 
       if (!image) return res.json("Добавьте изображение услуги")
@@ -335,6 +335,17 @@ class PostController {
       await image.mv(path.resolve(__dirname, '..', 'static/service_images', imageName));
       const service = await Service.create({name, price, image_url: `/static/service_images/${imageName}`})
 
+      JSON.parse(functions).map(async (item) => {
+        await Functional.create({
+          name: item.name,
+          price: item.price,
+          days: item.days,
+          description: item.description,
+          image: ``,
+          checked: item.checked,
+          serviceId: service.id
+        })
+      })
       return res.json(service)
     } catch (e) {
       return res.status(500).json({error: e.message})
@@ -367,6 +378,89 @@ class PostController {
       return res.json(services)
     } catch (e) {
       return res.status(500).json({error: e.message})
+    }
+  }
+
+  async getService(req, res) {
+    try {
+      const {id} = req.params
+      const service = await Service.findOne({
+        where: {id},
+        include: [{model: Functional}]
+      })
+      const service_post = await Service_post.findAll({where: {serviceId: id}})
+      let postsIds = service_post.map(item => item.postId)
+      const posts = await Post.findAll({
+        where: {
+          id: {[Op.in]: postsIds}
+        },
+        attributes: ['id', 'title', 'description', 'createdAt']
+      })
+      const cases = await Case.findAll({
+        limit: 5,
+        attributes: ['id', 'name']
+      })
+      service.dataValues.posts = posts
+      service.dataValues.cases = cases
+      return res.json(service)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async createFunction(req, res) {
+    try {
+      const {name, price, days, description, file, checked, serviceId} = req.body
+      const function_item = await Functional.create({name, price, days, description, file, checked, serviceId})
+      return res.json(function_item)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async getFunctions(req, res) {
+    try {
+      const {serviceId} = req.params
+      const functions = await Functional.findAll({where: {serviceId}})
+      return res.json(functions)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async createLead(req, res) {
+    try {
+      const {name, contact, functions} = req.body
+      let functions_names, lead_content_data
+      if (!name || !contact) return res.json("Нету имени или контактных данных")
+      const lead = await Lead.create({name, contact})
+      if (functions) {
+        // Получаем массив объектов, содержащих id и name из таблицы Functional
+        const functionsData = await Functional.findAll({
+          where: {id: {[Op.in]: functions}},
+          attributes: ['id', 'name'] // Нам нужно как id, так и name для сопоставления
+        });
+
+        // Преобразуем данные в объект для быстрого поиска по id
+        const functionsMap = functionsData.reduce((acc, func) => {
+          acc[func.id] = func.name; // Пример: {1: 'name1', 2: 'name2'}
+          return acc;
+        }, {});
+
+        // Создаем массив объектов для вставки в Lead_content
+        const lead_content_data = functions.map(id => ({
+          leadId: lead.id,
+          functionalId: id,
+          functional_name: functionsMap[id] // Подставляем имя функции по id
+        }));
+
+        // Массовое создание записей
+        await Lead_content.bulkCreate(lead_content_data);
+      }
+
+      return res.json({lead, lead_content_data})
+    } catch (e) {
+      return res.json({error: e.message})
     }
   }
 

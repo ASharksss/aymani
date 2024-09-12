@@ -63,6 +63,7 @@ const Service = sequelize.define('service', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
   name: {type: DataTypes.STRING},
   price: {type: DataTypes.INTEGER},
+  description: {type: DataTypes.TEXT},
   image_url: {type: DataTypes.TEXT},
   active: {type: DataTypes.BOOLEAN, defaultValue: true},
 })
@@ -89,6 +90,7 @@ const Service_post = sequelize.define('service_post', {
 
 const Lead_content = sequelize.define('lead_content', {
   id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  functional_name: {type: DataTypes.STRING}
 })
 
 const Comment = sequelize.define('сomment', {

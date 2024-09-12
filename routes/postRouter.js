@@ -16,6 +16,12 @@ router.get('/getCase/:id', postController.getCase)
 router.post('/createService', postController.createService)
 router.put('/updateService', postController.updateService)
 router.get('/getServices', postController.getServices)
+router.get('/getService/:id', postController.getService)
+router.post('/createFunction', postController.createFunction)
+router.get('/getFunctions/:serviceId', postController.getFunctions)
+
+
+router.post('/createLead', postController.createLead)
 
 router.post('/createTag', postController.createTag)
 router.get('/getTags', postController.getTags)
