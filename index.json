@@ -55,7 +55,7 @@
       "price": "24000",
       "days": 5,
       "description": "Блог помогает приобретать аудиторию ",
-      "image": "",
+      "image": "cover.jpg",
       "checked": false
     },
     {
@@ -63,7 +63,7 @@
       "price": "9200",
       "days": 3,
       "description": "Страница или блог, которая отображает Ваши работы",
-      "image": "",
+      "image": "super.png",
       "checked": false
     }
 

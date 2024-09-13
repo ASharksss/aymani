@@ -30,4 +30,7 @@ router.delete('/deleteTag/:id', postController.deleteTag)
 router.post('/createComment', postController.createComment)
 router.get('/getComments/:id', postController.getComments)
 
+router.post('/createFaqElement', postController.createFaqElement)
+router.get('/getFaq', postController.getFaq)
+
 module.exports = router

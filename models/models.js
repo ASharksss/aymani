@@ -104,6 +104,12 @@ const Comment = sequelize.define('сomment', {
   },
 })
 
+const Faq = sequelize.define('faq', {
+  id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+  header: {type: DataTypes.TEXT},
+  content: {type: DataTypes.TEXT}
+})
+
 //Relationships
 Lead.hasMany(Lead_content)
 Lead_content.belongsTo(Lead)
@@ -161,5 +167,6 @@ module.exports = {
   Service_post,
   Lead,
   Functional,
-  Lead_content
+  Lead_content,
+  Faq
 }

@@ -5,7 +5,7 @@ const {
   Post_category,
   Case,
   Case_attachments, Comment,
-  Case_blocks, Tag, Color_shem, Nuance_color, Functional, Lead, Lead_content, Service_post
+  Case_blocks, Tag, Color_shem, Nuance_color, Functional, Lead, Lead_content, Service_post, Faq
 } = require("../models/models");
 const {v4: uuidv4} = require('uuid');
 const path = require('path')
@@ -327,26 +327,35 @@ class PostController {
   async createService(req, res) {
     try {
       const {name, price, functions} = req.body
-      const image = req.files.image
-
-      if (!image) return res.json("Добавьте изображение услуги")
-      let typeImage = image.name.split('.').pop()
-      let imageName = `${uuidv4()}.${typeImage}`
-      await image.mv(path.resolve(__dirname, '..', 'static/service_images', imageName));
-      const service = await Service.create({name, price, image_url: `/static/service_images/${imageName}`})
-
-      JSON.parse(functions).map(async (item) => {
-        await Functional.create({
-          name: item.name,
-          price: item.price,
-          days: item.days,
-          description: item.description,
-          image: ``,
-          checked: item.checked,
-          serviceId: service.id
-        })
-      })
-      return res.json(service)
+      const examples = req.files.examples
+      const cover = req.files.cover
+      let service
+      if (!cover) return res.json("Добавьте изображение услуги")
+      if (!examples) return res.json("Добавьте изображение примеров")
+      if (cover) {
+        let typeImage = cover.name.split('.').pop()
+        let imageName = `${uuidv4()}.${typeImage}`
+        await cover.mv(path.resolve(__dirname, '..', 'static/service_images', imageName));
+        service = await Service.create({name, price, image_url: `/static/service_images/${imageName}`})
+      }
+      if (examples) {
+        for (let item of examples) {
+          let typeImage = item.name.split('.').pop()
+          let imageName = `${uuidv4()}.${typeImage}`
+          await item.mv(path.resolve(__dirname, '..', 'static/service_images', imageName))
+          let img = JSON.parse(functions).find((element) => element.image === item.name)
+          await Functional.create({
+            name: img.name,
+            price: img.price,
+            days: img.days,
+            description: img.description,
+            image: `/static/service_images/${imageName}`,
+            checked: img.checked,
+            serviceId: service.id
+          })
+        }
+      }
+      return res.json('все')
     } catch (e) {
       return res.status(500).json({error: e.message})
     }
@@ -546,6 +555,27 @@ class PostController {
       return res.json(result)
     } catch (e) {
       return res.status(500).json({error: e.message})
+    }
+  }
+
+  async createFaqElement(req, res) {
+    try {
+      const {header, content} = req.body
+      const faq = await Faq.create({header, content})
+      return res.json(faq)
+    } catch (e) {
+      return res.json({error: e.message})
+    }
+  }
+
+  async getFaq(req, res) {
+    try {
+      const faq = await Faq.findAll({
+        attributes: ['id', 'header', 'content']
+      })
+      return res.json(faq)
+    } catch (e) {
+      return res.json({error: e.message})
     }
   }
 
