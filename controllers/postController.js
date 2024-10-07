@@ -382,7 +382,7 @@ class PostController {
         where: {
           active: true
         },
-        attributes: ['name', 'price', 'image_url']
+        attributes: ['id', 'name', 'price', 'image_url']
       })
       return res.json(services)
     } catch (e) {
@@ -403,11 +403,11 @@ class PostController {
         where: {
           id: {[Op.in]: postsIds}
         },
-        attributes: ['id', 'title', 'description', 'createdAt']
+        attributes: ['id', 'title', 'cover', 'description', 'createdAt']
       })
       const cases = await Case.findAll({
         limit: 5,
-        attributes: ['id', 'name']
+        attributes: ['id', 'name', 'cover']
       })
       service.dataValues.posts = posts
       service.dataValues.cases = cases
