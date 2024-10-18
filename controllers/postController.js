@@ -327,11 +327,11 @@ class PostController {
   async createService(req, res) {
     try {
       const {name, price, functions} = req.body
-      const examples = req.files.examples
-      const cover = req.files.cover
+      const examples = req.files?.examples
+      const cover = req.files?.cover
       let service
       if (!cover) return res.json("Добавьте изображение услуги")
-      if (!examples) return res.json("Добавьте изображение примеров")
+      // if (!examples) return res.json("Добавьте изображение примеров")
       if (cover) {
         let typeImage = cover.name.split('.').pop()
         let imageName = `${uuidv4()}.${typeImage}`
@@ -357,6 +357,7 @@ class PostController {
       }
       return res.json('все')
     } catch (e) {
+      console.log(e)
       return res.status(500).json({error: e.message})
     }
   }
